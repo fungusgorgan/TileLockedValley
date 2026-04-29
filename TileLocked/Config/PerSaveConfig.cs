@@ -14,7 +14,19 @@ namespace TileLocked.Config
       NUM_TILES_AT_10_GOLD,
       NUM_TILES_AT_100_GOLD,
       NUM_TILES_AT_1000_GOLD,
+      NUM_BONUS_TILES_FOR_CC_ITEMS,
+      NUM_BONUS_TILES_FOR_CC_BUNDLES,
     }
+
+    private static Dictionary<Key, string> Defaults { get; } = new()
+    {
+      { Key.MOD_ENABLED, "false" },
+      { Key.NUM_TILES_AT_10_GOLD, "10" },
+      { Key.NUM_TILES_AT_100_GOLD, "500" },
+      { Key.NUM_TILES_AT_1000_GOLD, "5000" },
+      { Key.NUM_BONUS_TILES_FOR_CC_ITEMS, "5" },
+      { Key.NUM_BONUS_TILES_FOR_CC_BUNDLES, "25" }
+    };
 
     public static string Get(Key key)
     {
@@ -63,13 +75,5 @@ namespace TileLocked.Config
     {
       return PREFIX + key.ToString();
     }
-
-    private static Dictionary<Key, string> Defaults { get; } = new()
-    {
-      { Key.MOD_ENABLED, "false" },
-      { Key.NUM_TILES_AT_10_GOLD, "10" },
-      { Key.NUM_TILES_AT_100_GOLD, "500" },
-      { Key.NUM_TILES_AT_1000_GOLD, "5000" },
-    };
   }
 }

@@ -101,6 +101,23 @@ namespace TileLocked.Config
         setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.NUM_TILES_AT_1000_GOLD, value.ToString(), helper),
         min: 0
       );
+      configMenu.AddSectionTitle(modManifest, () => "Bonus Tiles");
+      configMenu.AddNumberOption(
+        mod: modManifest,
+        name: () => "Bonus tiles for CC items",
+        tooltip: () => "The number of bonus tiles received when donating an item to the community center.",
+        getValue: () => PerSaveConfig.GetInt(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_ITEMS),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_ITEMS, value.ToString(), helper),
+        min: 0
+      );
+      configMenu.AddNumberOption(
+        mod: modManifest,
+        name: () => "Bonus tiles for CC bundles",
+        tooltip: () => "The number of additional bonus tiles received when completing a community center bundle.",
+        getValue: () => PerSaveConfig.GetInt(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_BUNDLES),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_BUNDLES, value.ToString(), helper),
+        min: 0
+      );
     }
   }
 }

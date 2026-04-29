@@ -373,16 +373,14 @@ namespace TileLocked
                 // Workaround for vault bundles
                 if (slots.All(slot => slot) || VAULT_BUNDLE_KEYS.Contains(kvp.Key))
                 {
-                  LogDebug("All slots filled. Granting 25 bonus tiles.");
-                  tileManager.AddBankedTiles(25);
+                  tileManager.AddBankedTiles(PerSaveConfig.GetInt(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_BUNDLES));
                   UpdateBundleState();
                   bundleComplete = true;
                 }
               }
               if (!bundleComplete)
               {
-                LogDebug("Bundle not complete. Granting 5 bonus tiles.");
-                tileManager.AddBankedTiles(5);
+                tileManager.AddBankedTiles(PerSaveConfig.GetInt(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_ITEMS));
                 UpdateBundleState();
               }
             }
