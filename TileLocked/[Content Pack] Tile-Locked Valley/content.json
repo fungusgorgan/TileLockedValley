@@ -1,0 +1,21 @@
+{
+  "Format": "2.0.0",
+  "Changes": [
+    {
+      "Action": "EditData",
+      "Target": "Data/Objects",
+      "Entries": {
+        "UnveilingGlass": {
+          "Name": "UnveilingGlass",
+          "DisplayName": "The Unveiling Glass",
+          "Description": "Use this to purchase locked tiles.",
+          "Texture": "TileSheets/Tools",
+          "SpriteIndex": 5,
+          "CanBeTrashed": false,
+          "CanBeGivenAsGift": false,
+          "Category": -99
+        }
+      }
+    }
+  ]
+}

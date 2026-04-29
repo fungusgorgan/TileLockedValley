@@ -1,0 +1,20 @@
+{
+  "Name": "Tile-Locked Valley",
+  "Author": "Fungus",
+  "Version": "1.0.0",
+  "Description": "Unlock Stardew Valley one tile at a time.",
+  "UniqueID": "Fungus.TileLockedValley",
+  "EntryDll": "TileLocked.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": [],
+  "Dependencies": [
+    {
+      "UniqueID": "Pathoschild.ContentPatcher",
+      "IsRequired": true
+    },
+    {
+      "UniqueID": "spacechase0.GenericModConfigMenu",
+      "IsRequired": false
+    }
+  ]
+}
