@@ -67,40 +67,29 @@ namespace TileLocked
 
     public bool IsTileUnlocked(GameLocation location, Vector2 tile)
     {
-      if (location is FarmHouse farmHouse)
-      {
-        return IsOffsetTileUnlocked(location, tile - GetFarmhouseUpgradeOffset(farmHouse.upgradeLevel));
-      }
-      if (location is Shed shed)
-      {
-        return IsOffsetTileUnlocked(location, tile - GetShedUpgradeOffset(shed));
-      }
-      return IsOffsetTileUnlocked(location, tile);
-    }
-
-    private void UnlockTile(GameLocation location, Vector2 tile, bool purchased)
-    {
       string key = GetLocationKey(location);
-      TileUnlocked(key, tile, purchased);
-      
-      Game1.playSound("purchaseClick");
-
-      helper.Multiplayer.SendMessage(
-        new TileUnlockedMessage() { locationKey = key, tile = tile, purchased = purchased },
-        TileUnlockedMessage.TYPE,
-        new[] { helper.ModRegistry.ModID }
-      );
+      if (!unlockedTiles.ContainsKey(key))
+        return false;
+      Vector2 realTile = GetRealTile(
+        tile,
+        location is FarmHouse,
+        location is FarmHouse farmhouse ? farmhouse.upgradeLevel : 0,
+        location is Shed,
+        location is Shed shed && shed.mapPath.Contains("Shed2"));
+      return unlockedTiles[key].Contains(realTile);
     }
 
-    public void TileUnlocked(string locationKey, Vector2 tile, bool purchased)
+    public void TileUnlocked(TileUnlockedMessage message)
     {
+      string locationKey = message.locationKey;
       if (!unlockedTiles.ContainsKey(locationKey))
         unlockedTiles[locationKey] = new HashSet<Vector2>();
 
-      unlockedTiles[locationKey].Add(tile);
+      Vector2 realTile = GetRealTile(message.tile, message.isFarmhouse, message.farmhouseUpgradeLevel, message.isShed, message.isUpgradedShed);
+      unlockedTiles[locationKey].Add(realTile);
       numUnlockedTiles++;
 
-      if (purchased)
+      if (message.purchased)
         numPurchasedTiles++;
     }
 
@@ -221,17 +210,62 @@ namespace TileLocked
       return numPurchasedTiles;
     }
 
-    private bool IsOffsetTileUnlocked(GameLocation location, Vector2 tile)
+    private void UnlockTile(GameLocation location, Vector2 tile, bool purchased)
     {
-      string key = GetLocationKey(location);
-      if (!unlockedTiles.ContainsKey(key))
-        return false;
-      return unlockedTiles[key].Contains(tile);
+      TileUnlockedMessage message = BuildTileUnlockedMessage(location, tile, purchased);
+      TileUnlocked(message);
+      
+      Game1.playSound("purchaseClick");
+
+      helper.Multiplayer.SendMessage(
+        message,
+        TileUnlockedMessage.TYPE,
+        new[] { helper.ModRegistry.ModID }
+      );
     }
 
-    private static string GetSaveLocation()
+    private static Vector2 GetRealTile(Vector2 tile, bool isFarmhouse = false, int farmhouseUpgradeLevel = 0, bool isShed = false, bool isUpgradedShed = false)
     {
-      return $"data/${Constants.SaveFolderName}_{SAVE_LOCATION}.json";
+      if (isFarmhouse)
+      {
+        return GetFarmhouseTile(tile, farmhouseUpgradeLevel);
+      }
+      if (isShed)
+      {
+        return GetShedTile(tile, isUpgradedShed);
+      }
+      return tile;
+    }
+
+    private static Vector2 GetFarmhouseTile(Vector2 tile, int upgradeLevel)
+    {
+      return tile - GetFarmhouseUpgradeOffset(upgradeLevel);
+    }
+
+    private static Vector2 GetShedTile(Vector2 tile, bool isUpgraded)
+    {
+      if (isUpgraded)
+        return tile - new Vector2(3, 3);
+      return tile;
+    }
+
+    private static TileUnlockedMessage BuildTileUnlockedMessage(GameLocation location, Vector2 tile, bool purchased)
+    {
+      TileUnlockedMessage message = new() {
+        locationKey = GetLocationKey(location), 
+        tile = tile,
+        purchased = purchased};
+      if (location is FarmHouse farmhouse)
+      {
+        message.isFarmhouse = true;
+        message.farmhouseUpgradeLevel = farmhouse.upgradeLevel;
+      }
+      else if (location is Shed shed)
+      {
+        message.isShed = true;
+        message.isUpgradedShed = shed.mapPath.Contains("Shed2");
+      }
+      return message;
     }
 
     private static Vector2 GetFarmhouseUpgradeOffset(int upgradeLevel)
@@ -245,11 +279,9 @@ namespace TileLocked
       };
     }
 
-    private static Vector2 GetShedUpgradeOffset(Shed shed)
+    private static string GetSaveLocation()
     {
-      if (shed.mapPath.Contains("Shed2"))
-        return new Vector2(3, 3);
-      return new Vector2(0, 0);
+      return $"data/${Constants.SaveFolderName}_{SAVE_LOCATION}.json";
     }
   }
 

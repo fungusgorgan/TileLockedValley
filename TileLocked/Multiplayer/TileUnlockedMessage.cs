@@ -9,5 +9,9 @@ namespace TileLocked.Multiplayer
     public string locationKey = "";
     public Vector2 tile;
     public bool purchased;
+    public bool isFarmhouse;
+    public int farmhouseUpgradeLevel;
+    public bool isShed;
+    public bool isUpgradedShed;
   }
 }

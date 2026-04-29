@@ -3,7 +3,6 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Locations;
-using StardewValley.Menus;
 using TileLocked.Config;
 using TileLocked.Multiplayer;
 using TileLocked.Rendering;
@@ -15,12 +14,12 @@ namespace TileLocked
     private const int HOME_TILE_X = 64;
     private const int HOME_TILE_Y = 15;
     private const bool ALLOW_HIDING_PLAYER = true;
-    private readonly int[] VAULT_BUNDLE_KEYS = new int[] {23, 24, 25, 26};
 
     private ModConfig config = new();
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     private ConfigMenuRegistrar configMenuRegistrar;
+    private RewardsManager rewardsManager;
     private TileManager tileManager;
     private TileOverlayRenderer tileOverlayRenderer;
     private TileInfoRenderer tileInfoRenderer;
@@ -29,12 +28,12 @@ namespace TileLocked
     private string? lastPlayerLocation = null;
     private Vector2? lastPlayerPosition = null;
     private Vector2? lastHoveredTile = null;
-    private CommunityCenter? communityCenter;
     private readonly Dictionary<int, bool[]> bundleState = new();
 
     public override void Entry(IModHelper helper)
     {
       tileManager = new(helper);
+      rewardsManager = new(tileManager);
       config = helper.ReadConfig<ModConfig>();
       configMenuRegistrar = new ConfigMenuRegistrar(helper, ModManifest, config);
       tileOverlayRenderer = new(config, tileManager);
@@ -105,8 +104,7 @@ namespace TileLocked
       if (Context.IsMainPlayer)
       {
         tileManager.LoadData();
-        communityCenter = Game1.getLocationFromName("CommunityCenter") as CommunityCenter;
-        UpdateBundleState();
+        rewardsManager.Initialize();
       }
 
       configMenuRegistrar.InitializeConfigMenu();
@@ -135,10 +133,9 @@ namespace TileLocked
     {
       if (!Context.IsWorldReady) return;
 
-      if (Game1.activeClickableMenu is JunimoNoteMenu)
+      if (Context.IsMainPlayer)
       {
-        CheckForBundleChanges();
-        UpdateBundleState();
+        rewardsManager.CheckForChanges();
       }
 
       if (lastPlayerLocation == null
@@ -259,7 +256,7 @@ namespace TileLocked
           break;
         case TileUnlockedMessage.TYPE:
           TileUnlockedMessage tileUnlockedMessage = e.ReadAs<TileUnlockedMessage>();
-          tileManager.TileUnlocked(tileUnlockedMessage.locationKey, tileUnlockedMessage.tile, tileUnlockedMessage.purchased);
+          tileManager.TileUnlocked(tileUnlockedMessage);
           break;
         case BankedTilesAddedMessage.TYPE:
           BankedTilesAddedMessage bankedTilesAddedMessage = e.ReadAs<BankedTilesAddedMessage>();
@@ -348,57 +345,6 @@ namespace TileLocked
           || !tileManager.IsTileUnlocked(Game1.currentLocation, topRight)
           || !tileManager.IsTileUnlocked(Game1.currentLocation, bottomLeft)
           || !tileManager.IsTileUnlocked(Game1.currentLocation, bottomRight);
-    }
-
-    private void CheckForBundleChanges()
-    {
-      if (communityCenter != null)
-      {
-        foreach (var kvp in communityCenter.bundles.Pairs)
-        {
-          if (!bundleState.ContainsKey(kvp.Key))
-          {
-            bundleState[kvp.Key] = (bool[])kvp.Value.Clone();
-            continue;
-          }
-
-          for (int i = 0; i < bundleState[kvp.Key].Length; i++)
-          {
-            if (kvp.Value[i] && !bundleState[kvp.Key][i])
-            {
-              LogInfo("Found changed bundle item for key: " + kvp.Key);
-              bool bundleComplete = false;
-              if (communityCenter.bundles.TryGetValue(kvp.Key, out bool[] slots))
-              {
-                // Workaround for vault bundles
-                if (slots.All(slot => slot) || VAULT_BUNDLE_KEYS.Contains(kvp.Key))
-                {
-                  tileManager.AddBankedTiles(PerSaveConfig.GetInt(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_BUNDLES));
-                  UpdateBundleState();
-                  bundleComplete = true;
-                }
-              }
-              if (!bundleComplete)
-              {
-                tileManager.AddBankedTiles(PerSaveConfig.GetInt(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_CC_ITEMS));
-                UpdateBundleState();
-              }
-            }
-          }
-        }
-      }
-    }
-
-    private void UpdateBundleState()
-    {
-      if (communityCenter != null)
-      {
-        bundleState.Clear();
-        foreach (var kvp in communityCenter.bundles.Pairs)
-        {
-          bundleState[kvp.Key] = (bool[])kvp.Value.Clone();
-        }
-      }
     }
 
     private void LogDebug(string message)
