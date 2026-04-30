@@ -126,6 +126,14 @@ namespace TileLocked.Config
         setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.NUM_BONUS_TILES_FOR_MUSEUM_ITEMS, value.ToString(), helper),
         min: 0
       );
+      configMenu.AddSectionTitle(modManifest, () => "Other");
+      configMenu.AddBoolOption(
+        mod: modManifest,
+        name: () => "Knock out on failed unlock attempt",
+        tooltip: () => "If enabled, failing to unlock a tile you are forced to unlock (e.g. by warping to a locked tile without any bonus tiles or cash) will cause your character to be knocked out. If disabled, you will simply unlock the tile for free.",
+        getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT, value.ToString(), helper)
+      );
     }
   }
 }

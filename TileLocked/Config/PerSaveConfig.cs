@@ -17,6 +17,7 @@ namespace TileLocked.Config
       NUM_BONUS_TILES_FOR_CC_ITEMS,
       NUM_BONUS_TILES_FOR_CC_BUNDLES,
       NUM_BONUS_TILES_FOR_MUSEUM_ITEMS,
+      KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT,
     }
 
     private static Dictionary<Key, string> Defaults { get; } = new()
@@ -27,7 +28,8 @@ namespace TileLocked.Config
       { Key.NUM_TILES_AT_1000_GOLD, "5000" },
       { Key.NUM_BONUS_TILES_FOR_CC_ITEMS, "5" },
       { Key.NUM_BONUS_TILES_FOR_CC_BUNDLES, "25" },
-      { Key.NUM_BONUS_TILES_FOR_MUSEUM_ITEMS, "0" }
+      { Key.NUM_BONUS_TILES_FOR_MUSEUM_ITEMS, "0" },
+      { Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT, "true" }
     };
 
     public static string Get(Key key)

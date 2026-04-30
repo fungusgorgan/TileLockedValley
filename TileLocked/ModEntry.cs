@@ -327,9 +327,16 @@ namespace TileLocked
         {
           LogDebug("Tile purchased.");
         }
+        else if (PerSaveConfig.GetBool(PerSaveConfig.Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT))
+        {
+          Game1.addHUDMessage(new HUDMessage("Tried to visit a tile you can't afford. Good night...", HUDMessage.error_type));
+          Game1.player.stamina = -15;
+          return;
+        }
         else {
-          LogDebug("Tile cannot be purchased. Warping home...");
-          Game1.warpFarmer("Farm", HOME_TILE_X, HOME_TILE_Y, Farmer.down);
+          Game1.addHUDMessage(new HUDMessage("Tried to visit a tile you can't afford. A bonus tile was given to use instead.", HUDMessage.error_type));
+          tileManager.AddBankedTiles(1);
+          tileManager.TryPurchaseTile(Game1.currentLocation, tile);
         }
       }
     }
