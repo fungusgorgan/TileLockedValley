@@ -6,7 +6,9 @@
   "UniqueID": "Fungus.TileLockedValley",
   "EntryDll": "TileLocked.dll",
   "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": [],
+  "UpdateKeys": [
+    "Nexus:45613"
+  ],
   "Dependencies": [
     {
       "UniqueID": "Pathoschild.ContentPatcher",
