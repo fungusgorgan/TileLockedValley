@@ -23,6 +23,12 @@ namespace TileLocked
 
     public void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
     {
+      // Ignore if player is not free to act (e.g. in a menu, cutscene, etc.)
+      if (!Context.IsPlayerFree)
+      {
+        return;
+      }
+
       Item? activeItem = Game1.player.ActiveItem;
       if (e.Button == config.UnlockTileKeybind
           && activeItem != null
