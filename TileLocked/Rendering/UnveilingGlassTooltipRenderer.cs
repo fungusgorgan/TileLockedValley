@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -16,6 +17,7 @@ namespace TileLocked.Rendering
     public void OnRenderedHud(Vector2? lastHoveredTile)
     {
       if (RenderingUtils.ShouldRenderUi()
+          && Context.IsPlayerFree
           && Game1.player.ActiveItem?.ItemId == TileLockedConstants.UNVEILING_GLASS_ITEM_NAME
           && lastHoveredTile != null
           && !tileManager.IsTileUnlocked(Game1.player.currentLocation, lastHoveredTile.Value))
