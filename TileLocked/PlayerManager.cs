@@ -21,7 +21,7 @@ namespace TileLocked
       lastPlayerLocation = TileManager.GetLocationKey(Game1.currentLocation);
       lastPlayerPosition = Game1.player.Position;
 
-      if (!tileManager.IsTileUnlocked(Game1.currentLocation, Game1.player.Tile))
+      if (IsPlayerBoxInLockedTile(Game1.player.GetBoundingBox()))
       {
         PurchaseCurrentTilesOrWarpHome();
       }
@@ -34,10 +34,11 @@ namespace TileLocked
           || Game1.player.Position == lastPlayerPosition)
         return;
 
+      Rectangle playerBox = Game1.player.GetBoundingBox();
       string location = TileManager.GetLocationKey(Game1.currentLocation);
       if (location != lastPlayerLocation)
       {
-        if (!tileManager.IsTileUnlocked(Game1.currentLocation, Game1.player.Tile))
+        if (IsPlayerBoxInLockedTile(playerBox))
         {
           PurchaseCurrentTilesOrWarpHome();
           lastPlayerLocation = location;
@@ -46,20 +47,15 @@ namespace TileLocked
         }
       }
 
-      Rectangle playerBox = Game1.player.GetBoundingBox();
-
       // If locked tile is more than 1 away from previous tile, assume this was a warp
       if (IsPlayerBoxInLockedTile(playerBox)
           && lastPlayerPosition != null
           && Vector2.Distance(Game1.player.position.Get(), lastPlayerPosition.Value) > 64)
       {
-        if (!tileManager.IsTileUnlocked(Game1.currentLocation, Game1.player.Tile))
-        {
-          PurchaseCurrentTilesOrWarpHome();
-          lastPlayerLocation = location;
-          lastPlayerPosition = Game1.player.Position;
-          return;
-        }
+        PurchaseCurrentTilesOrWarpHome();
+        lastPlayerLocation = location;
+        lastPlayerPosition = Game1.player.Position;
+        return;
       }
 
       // Prevent player from walking into locked tiles
