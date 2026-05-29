@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Locations;
 using TileLocked.Config;
 
 namespace TileLocked
@@ -34,8 +35,15 @@ namespace TileLocked
           || Game1.player.Position == lastPlayerPosition)
         return;
 
-      Rectangle playerBox = Game1.player.GetBoundingBox();
       string location = TileManager.GetLocationKey(Game1.currentLocation);
+      if (IsPlayerInBusTransit())
+      {
+        lastPlayerLocation = location;
+        lastPlayerPosition = Game1.player.Position;
+        return;
+      }
+
+      Rectangle playerBox = Game1.player.GetBoundingBox();
       if (location != lastPlayerLocation)
       {
         if (IsPlayerBoxInLockedTile(playerBox))
@@ -116,6 +124,16 @@ namespace TileLocked
           tileManager.TryPurchaseTile(Game1.currentLocation, tile);
         }
       }
+    }
+
+    private static bool IsPlayerInBusTransit()
+    {
+      return Game1.currentLocation switch
+      {
+        Desert desert => desert.drivingBack || desert.drivingOff,
+        BusStop busStop => busStop.drivingBack || busStop.drivingOff,
+        _ => false
+      };
     }
 
     private bool IsPlayerBoxInLockedTile(Rectangle playerBox)
