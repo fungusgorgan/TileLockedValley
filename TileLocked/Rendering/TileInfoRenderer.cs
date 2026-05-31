@@ -58,7 +58,7 @@ namespace TileLocked.Rendering
       int numPurchased = tileManager.GetNumPurchasedTiles();
       int numFromBonus = numUnlocked - numPurchased;
       int numBonus = tileManager.GetNumBonusTiles();
-      string hoverText = "Tiles Unlocked: " + numPurchased + " (+" + numFromBonus + ")\nBonus Tiles: " + numBonus;
+      string hoverText = "Tiles Unlocked: " + numPurchased + " (+" + numFromBonus + ")\nTotal Unlocked Tiles: " + (numPurchased + numBonus) + "\nBonus Tiles: " + numBonus;
       IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.dialogueFont);
     }
 
