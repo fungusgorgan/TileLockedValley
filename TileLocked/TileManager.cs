@@ -9,6 +9,7 @@ namespace TileLocked
 {
   internal sealed class TileManager
   {
+    private const string SAVE_KEY = "Fungus.TileLockedValley_TileData";
     private const string SAVE_LOCATION = "TileData";
 
     private readonly IModHelper helper;
@@ -148,12 +149,16 @@ namespace TileLocked
         NumUnlocked = numUnlockedTiles,
         NumPurchased = numPurchasedTiles,
       };
-      helper.Data.WriteJsonFile(GetSaveLocation(), model);
+      helper.Data.WriteSaveData(SAVE_KEY, model);
     }
 
     public void LoadData()
     {
-      var model = helper.Data.ReadJsonFile<UnlockedTilesModel>(GetSaveLocation());
+      var model = helper.Data.ReadSaveData<UnlockedTilesModel>(SAVE_KEY);
+
+      if (model == null)
+        model = helper.Data.ReadJsonFile<UnlockedTilesModel>(GetSaveLocation());
+      
       if (model != null)
       {
         unlockedTiles = model.Unlocked ?? new();
