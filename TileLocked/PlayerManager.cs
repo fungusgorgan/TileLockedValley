@@ -65,18 +65,14 @@ namespace TileLocked
         int deltaY = Convert.ToInt32(Game1.player.position.Y - lastPlayerPosition.Value.Y);
         Rectangle xOnlyPlayerBox = new(playerBox.X, playerBox.Y - deltaY, playerBox.Width, playerBox.Height);
         Rectangle yOnlyPlayerBox = new(playerBox.X - deltaX, playerBox.Y, playerBox.Width, playerBox.Height);
-        if (!IsPlayerBoxInLockedTile(xOnlyPlayerBox))
-        {
-            Game1.player.Position -= new Vector2(0, deltaY);
-        }
-        else if (!IsPlayerBoxInLockedTile(yOnlyPlayerBox))
-        {
-            Game1.player.Position -= new Vector2(deltaX, 0);
-        }
-        else
-        {
-            Game1.player.Position = (Vector2)lastPlayerPosition;
-        }
+
+        bool needToRevertXMovement = IsPlayerBoxInLockedTile(xOnlyPlayerBox);
+        bool needToRevertYMovement = IsPlayerBoxInLockedTile(yOnlyPlayerBox);
+
+        Game1.player.Position = new Vector2(
+            needToRevertXMovement ? lastPlayerPosition.Value.X : Game1.player.Position.X, 
+            needToRevertYMovement ? lastPlayerPosition.Value.Y : Game1.player.Position.Y
+        );
       }
 
       lastPlayerLocation = location;
