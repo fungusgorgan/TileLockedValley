@@ -80,6 +80,14 @@ namespace TileLocked.Config
         getValue: () => config.UnlockedTileOverlayColor,
         setValue: value => config.UnlockedTileOverlayColor = value
       );
+      configMenu.AddSectionTitle(modManifest, () => "Tile Info");
+      configMenu.AddBoolOption(
+        mod: modManifest,
+        name: () => "Show total unlocked tiles on tooltip",
+        tooltip: () => "Show the total number of unlocked tiles as an extra line in the tile info tooltip.",
+        getValue: () => config.ShowTotalUnlockedTilesOnTooltip,
+        setValue: value => config.ShowTotalUnlockedTilesOnTooltip = value
+      );
     }
 
     private void AddConfigOptionsForMainPlayer(IGenericModConfigMenuApi configMenu)

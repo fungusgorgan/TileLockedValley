@@ -10,5 +10,6 @@ namespace TileLocked.Config
     public SButton TileOverlayToggleKeybind { get; set; } = SButton.L;
     public string LockedTileOverlayColor { get; set; } = "FF0000";
     public string UnlockedTileOverlayColor { get; set; } = "008000";
+    public bool ShowTotalUnlockedTilesOnTooltip { get; set; } = false;
   }
 }

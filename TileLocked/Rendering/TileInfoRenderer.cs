@@ -3,12 +3,14 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
+using TileLocked.Config;
 
 namespace TileLocked.Rendering
 {
 
   internal sealed class TileInfoRenderer
   {
+    private readonly ModConfig config;
     private readonly TileManager tileManager;
     private readonly PerScreen<ClickableTextureComponent> icon = new(
     () => new ClickableTextureComponent(
@@ -21,8 +23,9 @@ namespace TileLocked.Rendering
       Game1.pixelZoom
     ));
 
-    public TileInfoRenderer(TileManager tileManager)
+    public TileInfoRenderer(ModConfig config, TileManager tileManager)
     {
+      this.config = config;
       this.tileManager = tileManager;
     }
 
@@ -58,7 +61,12 @@ namespace TileLocked.Rendering
       int numPurchased = tileManager.GetNumPurchasedTiles();
       int numFromBonus = numUnlocked - numPurchased;
       int numBonus = tileManager.GetNumBonusTiles();
-      string hoverText = "Tiles Unlocked: " + numPurchased + " (+" + numFromBonus + ")\nBonus Tiles: " + numBonus;
+      string hoverText = "Tiles Unlocked: " + numPurchased + " (+" + numFromBonus + ")";
+      if (config.ShowTotalUnlockedTilesOnTooltip)
+      {
+        hoverText += "\nTotal Unlocked Tiles: " + numUnlocked;
+      }
+      hoverText += "\nBonus Tiles: " + numBonus;
       IClickableMenu.drawHoverText(Game1.spriteBatch, hoverText, Game1.dialogueFont);
     }
 
