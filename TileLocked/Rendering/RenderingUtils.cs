@@ -6,7 +6,11 @@ namespace TileLocked.Rendering
   {
     public static bool ShouldRenderUi()
     {
-      return Game1.displayHUD && !Game1.eventUp;
+      if (Game1.displayHUD && !Game1.eventUp)
+        return true;
+
+      return Game1.CurrentEvent != null
+          && Game1.CurrentEvent.isFestival;
     }
   }
 }
