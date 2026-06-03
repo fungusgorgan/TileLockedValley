@@ -9,8 +9,7 @@ namespace TileLocked.Rendering
       if (Game1.displayHUD && !Game1.eventUp)
         return true;
 
-      return Game1.player.ActiveItem?.ItemId == TileLockedConstants.UNVEILING_GLASS_ITEM_NAME
-          && Game1.CurrentEvent != null
+      return Game1.CurrentEvent != null
           && Game1.CurrentEvent.isFestival;
     }
   }
