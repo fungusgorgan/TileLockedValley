@@ -1,7 +1,7 @@
 {
   "Name": "Tile-Locked Valley",
   "Author": "Fungus",
-  "Version": "1.0.2",
+  "Version": "1.0.3",
   "Description": "Unlock Stardew Valley one tile at a time.",
   "UniqueID": "Fungus.TileLockedValley",
   "EntryDll": "TileLocked.dll",
