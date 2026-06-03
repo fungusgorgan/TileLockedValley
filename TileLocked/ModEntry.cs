@@ -2,6 +2,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using TileLocked.Config;
+using TileLocked.Delegate;
 using TileLocked.Multiplayer;
 using TileLocked.Rendering;
 
@@ -13,6 +14,7 @@ namespace TileLocked
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     private ConfigMenuRegistrar configMenuRegistrar;
+    private DelegateRegistrar delegateRegistrar;
     private RewardsManager rewardsManager;
     private TileManager tileManager;
     private PlayerManager playerManager;
@@ -30,6 +32,7 @@ namespace TileLocked
       config = helper.ReadConfig<ModConfig>();
 
       configMenuRegistrar = new ConfigMenuRegistrar(helper, ModManifest, config);
+      delegateRegistrar = new DelegateRegistrar(tileManager);
       tileOverlayRenderer = new(config, tileManager);
       inputManager = new(config, tileManager, tileOverlayRenderer);
       playerManager = new(tileManager);
@@ -67,6 +70,7 @@ namespace TileLocked
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
       configMenuRegistrar.InitializeConfigMenu();
+      delegateRegistrar.InitializeDelegates();
     }
 
     private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
