@@ -34,7 +34,7 @@ namespace TileLocked
       inputManager = new(config, tileManager, tileOverlayRenderer);
       playerManager = new(tileManager);
       multiplayerManager = new(helper, ModManifest, tileManager);
-      tileInfoRenderer = new(tileManager);
+      tileInfoRenderer = new(config, tileManager);
       unveilingGlassTooltipRenderer = new(tileManager);
 
       helper.Events.GameLoop.GameLaunched += OnGameLaunched;
