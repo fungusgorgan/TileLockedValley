@@ -2,7 +2,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using TileLocked.Config;
-using TileLocked.Extension;
+using TileLocked.Delegate;
 using TileLocked.Multiplayer;
 using TileLocked.Rendering;
 

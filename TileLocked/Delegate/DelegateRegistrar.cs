@@ -3,7 +3,7 @@ using StardewValley;
 using StardewValley.Delegates;
 using StardewValley.Triggers;
 
-namespace TileLocked.Extension
+namespace TileLocked.Delegate
 {
   internal sealed class DelegateRegistrar
   {
