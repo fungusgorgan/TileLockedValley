@@ -44,6 +44,7 @@ namespace TileLocked
       helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
       helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
       helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+      helper.Events.Player.Warped += OnWarped;
 
       helper.Events.Display.RenderedHud += IfEnabled<RenderedHudEventArgs>(OnRenderedHud);
       helper.Events.Display.RenderingHud += IfEnabled<RenderingHudEventArgs>(OnRenderingHud);
@@ -156,6 +157,43 @@ namespace TileLocked
     private void OnRenderedWorld(object? sender, RenderedWorldEventArgs e)
     {
       tileOverlayRenderer.OnRenderedWorld(e, inputManager.LastHoveredTile);
+    }
+
+    private void OnWarped(object? sender, WarpedEventArgs e)
+    {
+        if (!e.IsLocalPlayer)
+            return;
+
+      if (PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH))
+      {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+
+        tileManager.UpdateReachableTiles(e.NewLocation);
+
+        watch.Stop();
+
+        string logmsg = $"\nNew Location Entered\n\nReachable tiles generated for {TileManager.GetLocationKey(e.NewLocation)} in {watch.ElapsedMilliseconds}ms";
+        logmsg += $"\n\n{tileManager.DebugReachableTileKeys().Count} cached locations";
+        foreach (var (key, count) in tileManager.DebugReachableTileKeys())
+        {
+            logmsg += $"\n{key}: {count} tiles";
+        }
+
+        logmsg += $"\n\nClearing Unoccupied Locations...";
+
+        tileManager.ClearStaleCachedTiles();
+
+        logmsg += $"\n...Complete.";
+
+        logmsg += $"\n\n{tileManager.DebugReachableTileKeys().Count} cached locations";
+        foreach (var (key, count) in tileManager.DebugReachableTileKeys())
+        {
+            logmsg += $"\n{key}: {count} tiles";
+        }
+
+        Monitor.Log(logmsg, LogLevel.Debug);
+        
+      }
     }
 
     private void OnModMessageReceived(object? sender, ModMessageReceivedEventArgs e)

@@ -19,6 +19,23 @@ namespace TileLocked
     private int numUnlockedTiles = 0;
     private int numPurchasedTiles = 0;
 
+    private readonly Dictionary<string, HashSet<Vector2>> reachableTiles = new();
+    public HashSet<Vector2> ReachableTiles
+    {
+        get
+        {
+            string key = GetLocationKey(Game1.currentLocation);
+
+            if (!reachableTiles.TryGetValue(key, out var tiles))
+            {
+                tiles = new HashSet<Vector2>();
+                reachableTiles[key] = tiles;
+            }
+
+            return tiles;
+        }
+    }
+
     public TileManager(IModHelper helper)
     {
       this.helper = helper;
@@ -82,6 +99,35 @@ namespace TileLocked
         location is Shed,
         location is Shed shed && shed.mapPath.Contains("Shed2"));
       return unlockedTiles[key].Contains(realTile);
+    }
+
+    public bool IsNeverWalkable(GameLocation location, Vector2 tile)
+    {
+
+        if (!location.isTileOnMap(tile))
+            return true;
+
+        //Volcano Dungeon Lava    
+        if (location is VolcanoDungeon)
+        {
+          if (location.isWaterTile((int)tile.X, (int)tile.Y) &&
+            !location.CanRefillWateringCanOnTile((int)tile.X,(int)tile.Y))
+            return false;
+        }
+
+        string tileaction = location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Action","Buildings");
+
+        if (tileaction != null && ( tileaction.Contains("Door") || tileaction.Contains("Bridge") ))
+        {
+            // This is a door or bridge tile.
+            //Game1.addHUDMessage(new HUDMessage("Action Found: " + tileaction , HUDMessage.achievement_type));
+            return false;
+        }
+
+        if (!location.isTilePassable(tile))
+            return true;
+
+        return false;
     }
 
     public void TileUnlocked(TileUnlockedMessage message)
@@ -217,6 +263,98 @@ namespace TileLocked
     public int GetNumPurchasedTiles()
     {
       return numPurchasedTiles;
+    }
+
+    public HashSet<Vector2> GetReachableTiles(
+        GameLocation location,
+        HashSet<Vector2>? visited = null,
+        Vector2? discoveredTile = null)
+    {
+        visited ??= new HashSet<Vector2>();
+
+        Queue<Vector2> queue = new();
+
+        if (discoveredTile is Vector2 seedTile && visited.Add(seedTile))
+        {
+            queue.Enqueue(seedTile);
+        }
+
+        foreach (Vector2 seed in GetEntranceTiles(location))
+        {
+            if (visited.Add(seed))
+                queue.Enqueue(seed);
+        }
+
+
+        while (queue.Count > 0)
+        {
+            Vector2 tile = queue.Dequeue();
+
+            foreach (Vector2 neighbor in GetNeighbors(tile))
+            {
+                if (visited.Contains(neighbor))
+                    continue;
+
+                if (IsNeverWalkable(location, neighbor))
+                    continue;
+
+                visited.Add(neighbor);
+                queue.Enqueue(neighbor);
+            }
+        }
+
+        return visited;
+    }
+    public void UpdateReachableTiles(
+        GameLocation location,
+        HashSet<Vector2>? visited = null)
+    {
+        reachableTiles[GetLocationKey(location)] = GetReachableTiles(location, visited);
+    }
+    
+    public void ExpandReachableTiles(
+        GameLocation location,
+        Vector2? start = null)
+    {
+        reachableTiles[GetLocationKey(location)] = GetReachableTiles(location, reachableTiles[GetLocationKey(location)], start);
+    }
+
+    public void ClearStaleCachedTiles()
+    {
+      var occupiedLocations = Game1.getAllFarmers()
+        .Select(f => GetLocationKey(f.currentLocation))
+        .ToHashSet();
+
+      foreach (string key in reachableTiles.Keys.ToList())
+        {
+            if (!occupiedLocations.Contains(key))
+                reachableTiles.Remove(key);
+        }
+    }
+
+    public Dictionary<string, int> DebugReachableTileKeys()
+    {
+        return reachableTiles.ToDictionary(
+            pair => pair.Key,
+            pair => pair.Value.Count);
+    }
+    
+    private static IEnumerable<Vector2> GetNeighbors(Vector2 tile)
+    {
+        yield return new Vector2(tile.X - 1, tile.Y);
+        yield return new Vector2(tile.X + 1, tile.Y);
+        yield return new Vector2(tile.X, tile.Y - 1);
+        yield return new Vector2(tile.X, tile.Y + 1);
+    }
+
+    private static IEnumerable<Vector2> GetEntranceTiles(GameLocation location)
+    {
+        foreach (Warp warp in location.warps)
+        {
+            yield return new Vector2(warp.X, warp.Y);
+        }
+        // include player position as fallback seed
+        yield return Game1.player.Tile;
     }
 
     private void UnlockTile(GameLocation location, Vector2 tile, bool purchased)

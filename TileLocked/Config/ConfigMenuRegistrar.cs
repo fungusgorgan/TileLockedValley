@@ -150,6 +150,13 @@ namespace TileLocked.Config
         getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT),
         setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT, value.ToString(), helper)
       );
+      configMenu.AddBoolOption(
+        mod: modManifest,
+        name: () => "Only Lock Reachable Tiles\n(Experimental)",
+        tooltip: () => "Only places locks on tiles that can currently be reached through normal gameplay. Doors, bridges, and other traversable paths are included, while unreachable areas are ignored until they become accessible.",
+        getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH, value.ToString(), helper)
+      );
     }
   }
 }
