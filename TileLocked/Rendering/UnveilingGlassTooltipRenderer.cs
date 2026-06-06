@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
+using TileLocked.Config;
 
 namespace TileLocked.Rendering
 {
@@ -19,9 +20,11 @@ namespace TileLocked.Rendering
       if (RenderingUtils.ShouldRenderUi()
           && Context.IsPlayerFree
           && Game1.player.ActiveItem?.ItemId == TileLockedConstants.UNVEILING_GLASS_ITEM_NAME
-          && lastHoveredTile != null
+          && lastHoveredTile is Vector2 tile
           && !tileManager.IsTileUnlocked(Game1.player.currentLocation, lastHoveredTile.Value))
-      {
+      {  
+        if (PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH) && !tileManager.ReachableTiles.Contains(tile))
+            return;
         RenderTooltip();
       }
     }

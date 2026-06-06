@@ -157,6 +157,13 @@ namespace TileLocked.Config
         getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES),
         setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES, value.ToString(), helper)
       );
+      configMenu.AddBoolOption(
+        mod: modManifest,
+        name: () => "Only Lock Reachable Tiles\n(Experimental)",
+        tooltip: () => "Only places locks on tiles that can currently be reached through normal gameplay. Doors, bridges, and other traversable paths are included, while unreachable areas are ignored until they become accessible.",
+        getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH, value.ToString(), helper)
+      );
     }
   }
 }
