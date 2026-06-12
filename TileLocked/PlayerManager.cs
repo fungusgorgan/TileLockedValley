@@ -67,16 +67,26 @@ namespace TileLocked
       }
 
       // Prevent player from walking into locked tiles
-      if (IsPlayerBoxInLockedTile(playerBox) && lastPlayerPosition != null)
-      {
-        int deltaX = Convert.ToInt32(Game1.player.position.X - lastPlayerPosition.Value.X);
-        int deltaY = Convert.ToInt32(Game1.player.position.Y - lastPlayerPosition.Value.Y);
-        Rectangle xOnlyPlayerBox = new(playerBox.X, playerBox.Y - deltaY, playerBox.Width, playerBox.Height);
-        Rectangle yOnlyPlayerBox = new(playerBox.X - deltaX, playerBox.Y, playerBox.Width, playerBox.Height);
+      // Create a rect from playerbox and shrink it to tune how close the player can get to the edge of neighboring tiles.
+      Rectangle collisionPlayerbox = playerBox;
+      int collisionPadding = -Game1.tileSize / 6;
+      collisionPlayerbox.Inflate(collisionPadding, collisionPadding);
 
+      if (IsPlayerBoxInLockedTile(collisionPlayerbox) && lastPlayerPosition != null)
+      {
+        Vector2 delta = Game1.player.nextPositionVector2() - collisionPlayerbox.Center.ToVector2();
+
+        //Check if the player had only moved in the X axis if there would still be a collision.
+        Rectangle xOnlyPlayerBox = collisionPlayerbox;
+        xOnlyPlayerBox.Offset(0, -delta.Y);
         bool needToRevertXMovement = IsPlayerBoxInLockedTile(xOnlyPlayerBox);
+
+        //Check if the player had only moved in the Y axis if there would still be a collision.
+        Rectangle yOnlyPlayerBox = collisionPlayerbox;
+        yOnlyPlayerBox.Offset(-delta.X, 0);
         bool needToRevertYMovement = IsPlayerBoxInLockedTile(yOnlyPlayerBox);
 
+        //Revert X movement, Y movement, both, or none depending on collision results.
         Game1.player.Position = new Vector2(
             needToRevertXMovement ? lastPlayerPosition.Value.X : Game1.player.Position.X, 
             needToRevertYMovement ? lastPlayerPosition.Value.Y : Game1.player.Position.Y
