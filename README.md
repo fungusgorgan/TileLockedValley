@@ -1,6 +1,6 @@
 # Tile-Locked Valley: The Mod
 
-This is the open-source repository for the Tile-Locked Valley mod.
+This is the source-visible repository for the Tile-Locked Valley mod.
 
 The mod is pretty small, and hopefully pretty self-explanatory, so this README is pretty barebones. Perhaps I'll add more at a later date.
 
