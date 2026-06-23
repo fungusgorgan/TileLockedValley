@@ -57,7 +57,8 @@ namespace TileLocked
       if (lastPlayerLocation == null
           || lastPlayerPosition == null
           || Game1.farmEvent != null
-          || Game1.player.Position == lastPlayerPosition)
+          || Game1.player.Position == lastPlayerPosition
+          || IsPlayerInCutScene())
         return;
 
       string location = TileManager.GetLocationKey(Game1.player.currentLocation);
@@ -165,6 +166,17 @@ namespace TileLocked
         BusStop busStop => busStop.drivingBack || busStop.drivingOff,
         _ => false
       };
+    }
+    private static bool IsPlayerInCutScene()
+    {
+      if(!PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_MOD_DURING_CUTSCENES)) return false;
+      //Do nothing if the setting is not ticked.
+
+      if(Game1.farmEvent != null) return true;
+      //Fairy Events and the like.
+
+      return Game1.player.IsBusyDoingSomething();
+      //Cutscenes.
     }
 
     private bool IsPlayerBoxInLockedTile(Rectangle playerBox)
