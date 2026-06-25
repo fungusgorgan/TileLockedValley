@@ -115,13 +115,6 @@ namespace TileLocked
       }
 
       configMenuRegistrar.InitializeConfigMenu();
-
-      // Remove unveiling glass from shipping log in existing saves
-      string toolId = ItemRegistry.GetData("(O)" + TileLockedConstants.UNVEILING_GLASS_ITEM_NAME)?.ItemId;
-      if(toolId != null && Game1.masterPlayer?.shippedCounters?.ContainsKey(toolId) == true) {
-        Game1.masterPlayer.shippedCounters.Remove(toolId);
-        Game1.stats.checkForShippingAchievements();
-      }
     }
 
     private void OnSaving(object? sender, SavingEventArgs e)
