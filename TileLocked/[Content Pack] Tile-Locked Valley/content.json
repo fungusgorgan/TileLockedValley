@@ -11,6 +11,7 @@
           "Description": "Use this to purchase locked tiles.",
           "Texture": "TileSheets/Tools",
           "SpriteIndex": 5,
+          "ExcludeFromShippingCollection": true,
           "CanBeTrashed": false,
           "CanBeGivenAsGift": false,
           "Category": -99
