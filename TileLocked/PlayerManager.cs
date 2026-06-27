@@ -9,8 +9,32 @@ namespace TileLocked
   internal sealed class PlayerManager
   {
     private readonly TileManager tileManager;
-    private string? lastPlayerLocation = null;
-    private Vector2? lastPlayerPosition = null;
+    private readonly Dictionary<long, string?> _lastPlayerLocations = new();
+    private readonly Dictionary<long, Vector2?> _lastPlayerPositions = new();
+
+    private T? GetPlayerValue<T>(Dictionary<long, T?> dict)
+    {
+        return dict.TryGetValue(Game1.player.UniqueMultiplayerID, out var value)
+            ? value
+            : default;
+    }
+
+    private void SetPlayerValue<T>(Dictionary<long, T?> dict, T? value)
+    {
+        dict[Game1.player.UniqueMultiplayerID] = value;
+    }
+
+    private string? lastPlayerLocation
+    {
+        get => GetPlayerValue(_lastPlayerLocations);
+        set => SetPlayerValue(_lastPlayerLocations, value);
+    }
+
+    private Vector2? lastPlayerPosition
+    {
+        get => GetPlayerValue(_lastPlayerPositions);
+        set => SetPlayerValue(_lastPlayerPositions, value);
+    }
 
     public PlayerManager(TileManager tileManager)
     {
@@ -19,7 +43,7 @@ namespace TileLocked
 
     public void OnDayStarted(object? sender, DayStartedEventArgs e)
     {
-      lastPlayerLocation = TileManager.GetLocationKey(Game1.currentLocation);
+      lastPlayerLocation = TileManager.GetLocationKey(Game1.player.currentLocation);
       lastPlayerPosition = Game1.player.Position;
 
       if (IsPlayerBoxInLockedTile(Game1.player.GetBoundingBox()))
@@ -35,7 +59,7 @@ namespace TileLocked
           || Game1.player.Position == lastPlayerPosition)
         return;
 
-      string location = TileManager.GetLocationKey(Game1.currentLocation);
+      string location = TileManager.GetLocationKey(Game1.player.currentLocation);
       if (IsPlayerInBusTransit())
       {
         lastPlayerLocation = location;
@@ -110,10 +134,10 @@ namespace TileLocked
 
       foreach (Vector2 tile in currentTiles)
       {
-        if (tileManager.IsTileUnlocked(Game1.currentLocation, tile))
+        if (tileManager.IsTileUnlocked(Game1.player.currentLocation, tile))
           continue;
 
-        if (tileManager.TryPurchaseTile(Game1.currentLocation, tile))
+        if (tileManager.TryPurchaseTile(Game1.player.currentLocation, tile))
         {
           continue;
         }
@@ -127,14 +151,14 @@ namespace TileLocked
         {
           Game1.addHUDMessage(new HUDMessage("Tried to visit a tile you can't afford. A bonus tile was given to use instead.", HUDMessage.error_type));
           tileManager.AddBankedTiles(1);
-          tileManager.TryPurchaseTile(Game1.currentLocation, tile);
+          tileManager.TryPurchaseTile(Game1.player.currentLocation, tile);
         }
       }
     }
 
     private static bool IsPlayerInBusTransit()
     {
-      return Game1.currentLocation switch
+      return Game1.player.currentLocation switch
       {
         Desert desert => desert.drivingBack || desert.drivingOff,
         BusStop busStop => busStop.drivingBack || busStop.drivingOff,
@@ -149,10 +173,10 @@ namespace TileLocked
       var bottomLeft = new Vector2(playerBox.Left / Game1.tileSize, (playerBox.Bottom - 1) / Game1.tileSize);
       var bottomRight = new Vector2((playerBox.Right - 1) / Game1.tileSize, (playerBox.Bottom - 1) / Game1.tileSize);
 
-      return !tileManager.IsTileUnlocked(Game1.currentLocation, topLeft)
-          || !tileManager.IsTileUnlocked(Game1.currentLocation, topRight)
-          || !tileManager.IsTileUnlocked(Game1.currentLocation, bottomLeft)
-          || !tileManager.IsTileUnlocked(Game1.currentLocation, bottomRight);
+      return !tileManager.IsTileUnlocked(Game1.player.currentLocation, topLeft)
+          || !tileManager.IsTileUnlocked(Game1.player.currentLocation, topRight)
+          || !tileManager.IsTileUnlocked(Game1.player.currentLocation, bottomLeft)
+          || !tileManager.IsTileUnlocked(Game1.player.currentLocation, bottomRight);
     }
   }
 }
