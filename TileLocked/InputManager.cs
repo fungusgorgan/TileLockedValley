@@ -12,7 +12,21 @@ namespace TileLocked
     private readonly ModConfig config;
     private readonly TileManager tileManager;
     private readonly TileOverlayRenderer tileOverlayRenderer;
-    public Vector2? LastHoveredTile { get; private set; }
+    private readonly Dictionary<long, Vector2?> _lastHoveredTiles = new();
+
+    public Vector2? LastHoveredTile
+    {
+        get
+        {
+            return _lastHoveredTiles.TryGetValue(Game1.player.UniqueMultiplayerID, out var value)
+                ? value
+                : null;
+        }
+        private set
+        {
+            _lastHoveredTiles[Game1.player.UniqueMultiplayerID] = value;
+        }
+    }
 
     public InputManager(ModConfig config, TileManager tileManager, TileOverlayRenderer tileOverlayRenderer)
     {
