@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
+using StardewValley.TerrainFeatures;
 using TileLocked.Config;
 using TileLocked.Multiplayer;
 
@@ -115,14 +116,13 @@ namespace TileLocked
             return false;
         }
 
+        if (location.getLargeTerrainFeatureAt((int)tile.X, (int)tile.Y) is Bush)
+          return true;
+
         string tileaction = location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Action","Buildings");
 
         if (tileaction != null && ( tileaction.Contains("Door") || tileaction.Contains("Bridge") ))
-        {
-            // This is a door or bridge tile.
-            //Game1.addHUDMessage(new HUDMessage("Action Found: " + tileaction , HUDMessage.achievement_type));
-            return false;
-        }
+          return false;
 
         if (!location.isTilePassable(tile))
             return true;
