@@ -166,33 +166,8 @@ namespace TileLocked
 
       if (PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH))
       {
-        var watch = System.Diagnostics.Stopwatch.StartNew();
-
         tileManager.UpdateReachableTiles(e.NewLocation);
-
-        watch.Stop();
-
-        string logmsg = $"\nNew Location Entered\n\nReachable tiles generated for {TileManager.GetLocationKey(e.NewLocation)} in {watch.ElapsedMilliseconds}ms";
-        logmsg += $"\n\n{tileManager.DebugReachableTileKeys().Count} cached locations";
-        foreach (var (key, count) in tileManager.DebugReachableTileKeys())
-        {
-            logmsg += $"\n{key}: {count} tiles";
-        }
-
-        logmsg += $"\n\nClearing Unoccupied Locations...";
-
         tileManager.ClearStaleCachedTiles();
-
-        logmsg += $"\n...Complete.";
-
-        logmsg += $"\n\n{tileManager.DebugReachableTileKeys().Count} cached locations";
-        foreach (var (key, count) in tileManager.DebugReachableTileKeys())
-        {
-            logmsg += $"\n{key}: {count} tiles";
-        }
-
-        Monitor.Log(logmsg, LogLevel.Debug);
-        
       }
     }
 

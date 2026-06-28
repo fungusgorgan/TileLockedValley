@@ -331,13 +331,6 @@ namespace TileLocked
                 reachableTiles.Remove(key);
         }
     }
-
-    public Dictionary<string, int> DebugReachableTileKeys()
-    {
-        return reachableTiles.ToDictionary(
-            pair => pair.Key,
-            pair => pair.Value.Count);
-    }
     
     private static IEnumerable<Vector2> GetNeighbors(Vector2 tile)
     {
