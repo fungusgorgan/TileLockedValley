@@ -28,11 +28,19 @@ jobs:
       with:
         dotnet-version: '6.0.x' 
 
-    # 4. Build project - Pathoschild's MSBuild package will generate the zip file automatically
-    - name: Build and Pack Mod
-      run: dotnet build -c Release -p:EnableModDeploy=false -p:GamePath="${{ github.workspace }}"
+    # 4. Create a mock game folder to bypass ModBuildConfig validation
+    - name: Bypass Game Path Check
+      run: |
+        mkdir -p "${{ github.workspace }}/mock-game"
+        touch "${{ github.workspace }}/mock-game/Stardew Valley.dll"
+        touch "${{ github.workspace }}/mock-game/StardewValley.dll"
+      shell: bash
 
-    # 5. Restructure zip for Vortex/Mod Loader compatibility
+    # 5. Build project using the mock folder
+    - name: Build and Pack Mod
+      run: dotnet build -c Release -p:EnableModDeploy=false -p:GamePath="${{ github.workspace }}/mock-game"
+
+    # 6. Restructure zip for Vortex/Mod Loader compatibility
     - name: Flatten Zip Structure
       run: |
         ZIP_PATH="_releases/TileLocked ${{ steps.get_version.outputs.version }}.zip"
@@ -55,7 +63,7 @@ jobs:
         rm -r tmp_extract
       shell: bash
 
-    # 6. Push production build to Nexus Mods via official API action
+    # 7. Push production build to Nexus Mods via official API action
     - name: Upload to Nexus Mods
       uses: Nexus-Mods/upload-action@v1.0.0-beta.8
       with:
@@ -67,7 +75,7 @@ jobs:
         category: 'main'
         primary_mod_manager_download: true
 
-    # 7. Push production build to CurseForge ecosystem
+    # 8. Push production build to CurseForge ecosystem
     - name: Upload to CurseForge
       uses: itsmeow/curseforge-upload@v3
       with:
