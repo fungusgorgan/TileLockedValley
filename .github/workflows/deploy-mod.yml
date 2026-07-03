@@ -1,0 +1,81 @@
+name: Build and Automatically Deploy Mod
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. Checkout the source code
+    - name: Fetch repository code
+      uses: actions/checkout@v4
+
+    # 2. Extract version directly from manifest.json to use for tagging uploads
+    - name: Parse Mod Version
+      id: get_version
+      run: |
+        VERSION=$(jq -r '.Version' manifest.json)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+      shell: bash
+
+    # 3. Setup .NET environment matching current SMAPI execution runtimes
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x' 
+
+    # 4. Build project - Pathoschild's MSBuild package will generate the zip file automatically
+    - name: Build and Pack Mod
+      run: dotnet build -c Release
+
+    # 5. Restructure zip for Vortex/Mod Loader compatibility
+    - name: Flatten Zip Structure
+      run: |
+        ZIP_PATH="_releases/TileLocked ${{ steps.get_version.outputs.version }}.zip"
+        
+        # Extract the nested structure
+        mkdir tmp_extract
+        unzip "$ZIP_PATH" -d tmp_extract
+        
+        # Remove original nested zip
+        rm "$ZIP_PATH"
+        
+        # Navigate into the top-level folder (TileLocked)
+        cd tmp_extract/TileLocked
+        
+        # Zip the contents directly back out to the _releases directory
+        zip -r "../../$ZIP_PATH" *
+        
+        # Clean up the temporary workspace
+        cd ../..
+        rm -r tmp_extract
+      shell: bash
+
+    # 6. Push production build to Nexus Mods via official API action
+    - name: Upload to Nexus Mods
+      uses: Nexus-Mods/upload-action@v1.0.0-beta.8
+      with:
+        api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+        file_id: '45613' 
+        filename: '_releases/TileLocked ${{ steps.get_version.outputs.version }}.zip'
+        version: ${{ steps.get_version.outputs.version }}
+        display_name: 'Tile-Locked Valley v${{ steps.get_version.outputs.version }}'
+        category: 'main'
+        primary_mod_manager_download: true
+
+    # 7. Push production build to CurseForge ecosystem
+    - name: Upload to CurseForge
+      uses: itsmeow/upload-to-curseforge@v0.1.1
+      with:
+        token: ${{ secrets.CURSEFORGE_TOKEN }}
+        project_id: '1553955'
+        game_endpoint: 'stardewvalley'
+        file_path: '_releases/TileLocked ${{ steps.get_version.outputs.version }}.zip'
+        display_name: 'Tile-Locked Valley v${{ steps.get_version.outputs.version }}'
+        release_type: 'release'
+        changelog: 'Automated deployment from GitHub main branch merge.'
+        changelog_type: 'text'
