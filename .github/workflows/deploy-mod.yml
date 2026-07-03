@@ -57,10 +57,10 @@ jobs:
 
     # 6. Push production build to Nexus Mods via official API action
     - name: Upload to Nexus Mods
-      uses: Nexus-Mods/upload-action@v1.0.0-beta.8
+      uses: Nexus-Mods/upload-action@latest
       with:
         api_key: ${{ secrets.NEXUSMODS_API_KEY }}
-        file_id: '45613' 
+        file_id: '7444670'
         filename: '_releases/TileLocked ${{ steps.get_version.outputs.version }}.zip'
         version: ${{ steps.get_version.outputs.version }}
         display_name: 'Tile-Locked Valley v${{ steps.get_version.outputs.version }}'
@@ -69,7 +69,7 @@ jobs:
 
     # 7. Push production build to CurseForge ecosystem
     - name: Upload to CurseForge
-      uses: itsmeow/upload-to-curseforge@v0.1.1
+      uses: itsmeow/upload-to-curseforge@v3
       with:
         token: ${{ secrets.CURSEFORGE_TOKEN }}
         project_id: '1553955'
