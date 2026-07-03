@@ -152,10 +152,10 @@ namespace TileLocked.Config
       );
       configMenu.AddBoolOption(
         mod: modManifest,
-        name: () => "Unlock player during cutscenes",
-        tooltip: () => "If enabled, you will not be locked during cutscenes. If the cutscene ends with you on a locked tile, you will attempt to unlock it.",
-        getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_MOD_DURING_CUTSCENES),
-        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.DISABLE_MOD_DURING_CUTSCENES, value.ToString(), helper)
+        name: () => "Ignore locked tiles during cutscenes",
+        tooltip: () => "If enabled, locked tiles will be ignored during cutscenes. If the cutscene ends with you on a locked tile, you will still need to unlock it.",
+        getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES, value.ToString(), helper)
       );
     }
   }
