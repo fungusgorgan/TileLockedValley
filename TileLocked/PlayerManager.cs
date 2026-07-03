@@ -52,13 +52,27 @@ namespace TileLocked
       }
     }
 
+    private bool ShouldSkipUpdateTick()
+    {
+        if (lastPlayerLocation == null || lastPlayerPosition == null)
+            return true;
+
+        if (Game1.player.Position == lastPlayerPosition)
+            return true;
+
+        if (Game1.farmEvent != null)
+            return true;
+
+        if (PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES)
+            && Game1.player.IsBusyDoingSomething() && !Game1.player.canMove )
+            return true;
+
+        return false;
+    }
+
     public void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
     {
-      if (lastPlayerLocation == null
-          || lastPlayerPosition == null
-          || Game1.farmEvent != null
-          || Game1.player.Position == lastPlayerPosition)
-        return;
+      if ( ShouldSkipUpdateTick() ) return;
 
       string location = TileManager.GetLocationKey(Game1.player.currentLocation);
       if (IsPlayerInBusTransit())

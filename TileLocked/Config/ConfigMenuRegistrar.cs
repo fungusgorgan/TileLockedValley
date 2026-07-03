@@ -150,6 +150,13 @@ namespace TileLocked.Config
         getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT),
         setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT, value.ToString(), helper)
       );
+      configMenu.AddBoolOption(
+        mod: modManifest,
+        name: () => "Ignore locked tiles during cutscenes",
+        tooltip: () => "If enabled, locked tiles will be ignored during cutscenes. If the cutscene ends with you on a locked tile, you will still need to unlock it.",
+        getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES, value.ToString(), helper)
+      );
     }
   }
 }
