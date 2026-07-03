@@ -57,7 +57,7 @@ jobs:
 
     # 6. Push production build to Nexus Mods via official API action
     - name: Upload to Nexus Mods
-      uses: Nexus-Mods/upload-action@latest
+      uses: Nexus-Mods/upload-action@v1.0.0-beta.8
       with:
         api_key: ${{ secrets.NEXUSMODS_API_KEY }}
         file_id: '7444670'
