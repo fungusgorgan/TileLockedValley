@@ -30,7 +30,7 @@ jobs:
 
     # 4. Build project - Pathoschild's MSBuild package will generate the zip file automatically
     - name: Build and Pack Mod
-      run: dotnet build -c Release
+      run: dotnet build -c Release -p:EnableModDeploy=false -p:GamePath="${{ github.workspace }}"
 
     # 5. Restructure zip for Vortex/Mod Loader compatibility
     - name: Flatten Zip Structure
