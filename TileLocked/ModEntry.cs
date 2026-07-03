@@ -161,8 +161,7 @@ namespace TileLocked
 
     private void OnWarped(object? sender, WarpedEventArgs e)
     {
-        if (!e.IsLocalPlayer)
-            return;
+      if (!e.IsLocalPlayer) return;
 
       if (PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH))
       {
