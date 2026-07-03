@@ -34,6 +34,8 @@ jobs:
         mkdir -p "${{ github.workspace }}/mock-game"
         touch "${{ github.workspace }}/mock-game/Stardew Valley.dll"
         touch "${{ github.workspace }}/mock-game/StardewValley.dll"
+        touch "${{ github.workspace }}/mock-game/StardewModdingAPI.dll"
+        touch "${{ github.workspace }}/mock-game/StardewModdingAPI.exe"
       shell: bash
 
     # 5. Build project using the mock folder
