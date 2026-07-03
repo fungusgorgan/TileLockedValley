@@ -56,6 +56,7 @@ namespace TileLocked
     {
       if (lastPlayerLocation == null
           || lastPlayerPosition == null
+          || Game1.farmEvent != null
           || Game1.player.Position == lastPlayerPosition)
         return;
 
