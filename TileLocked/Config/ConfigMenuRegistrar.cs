@@ -157,6 +157,13 @@ namespace TileLocked.Config
         getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES),
         setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES, value.ToString(), helper)
       );
+      configMenu.AddBoolOption(
+        mod: modManifest,
+        name: () => "Only lock reachable tiles\n(Experimental)",
+        tooltip: () => "Only lock tiles that the player can reach. Tiles in unreachable areas, or areas outside the map bounds will be ignored.",
+        getValue: () => PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH),
+        setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH, value.ToString(), helper)
+      );
     }
   }
 }
