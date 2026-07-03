@@ -69,7 +69,7 @@ jobs:
 
     # 7. Push production build to CurseForge ecosystem
     - name: Upload to CurseForge
-      uses: itsmeow/upload-to-curseforge@v3
+      uses: itsmeow/curseforge-upload@v3
       with:
         token: ${{ secrets.CURSEFORGE_TOKEN }}
         project_id: '1553955'
