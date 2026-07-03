@@ -18,7 +18,7 @@ jobs:
     - name: Parse Mod Version
       id: get_version
       run: |
-        VERSION=$(jq -r '.Version' manifest.json)
+        VERSION=$(jq -r '.Version' TileLocked/manifest.json)
         echo "version=$VERSION" >> $GITHUB_OUTPUT
       shell: bash
 
