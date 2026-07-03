@@ -19,6 +19,7 @@ namespace TileLocked.Config
       NUM_BONUS_TILES_FOR_MUSEUM_ITEMS,
       KNOCK_OUT_ON_FAILED_UNLOCK_ATTEMPT,
       DISABLE_LOCKED_TILES_DURING_CUTSCENES,
+      ONLY_LOCK_TILES_PLAYER_CAN_REACH,
     }
 
     private static Dictionary<Key, string> Defaults { get; } = new()
