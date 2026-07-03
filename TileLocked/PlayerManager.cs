@@ -64,7 +64,7 @@ namespace TileLocked
             return true;
 
         if (PerSaveConfig.GetBool(PerSaveConfig.Key.DISABLE_LOCKED_TILES_DURING_CUTSCENES)
-            && Game1.player.IsBusyDoingSomething())
+            && Game1.player.IsBusyDoingSomething() && !Game1.player.canMove )
             return true;
 
         return false;
