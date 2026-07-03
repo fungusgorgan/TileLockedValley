@@ -1,6 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <!-- Instructs SMAPI to bundle the compiled mod zip here -->
-    <ModZipPath>$(MSBuildThisFileDirectory)/_releases</ModZipPath>
-  </PropertyGroup>
-</Project>
