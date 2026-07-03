@@ -48,6 +48,14 @@ namespace TileLocked.Rendering
 
     public void OnRenderedWorld(RenderedWorldEventArgs e, Vector2? lastHoveredTile)
     {
+      if (
+        PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH) &&
+        tileManager.ReachableTiles.Count == 0
+      )
+      {
+        tileManager.UpdateReachableTiles(Game1.currentLocation);
+      }
+
       if (OverlayMode != OverlayMode.Off)
         DrawTileOverlay(e, lastHoveredTile);
     }
@@ -79,6 +87,10 @@ namespace TileLocked.Rendering
             continue;
 
           Vector2 tile = new(x, y);
+          
+          if (PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH) && !tileManager.ReachableTiles.Contains(tile))
+            continue;
+
           if (OverlayMode == OverlayMode.LockedTiles && !tileManager.IsTileUnlocked(Game1.currentLocation, tile))
           {
             Vector2 position = new(

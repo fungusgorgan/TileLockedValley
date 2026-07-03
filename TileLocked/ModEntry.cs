@@ -44,6 +44,7 @@ namespace TileLocked
       helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
       helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
       helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+      helper.Events.Player.Warped += OnWarped;
 
       helper.Events.Display.RenderedHud += IfEnabled<RenderedHudEventArgs>(OnRenderedHud);
       helper.Events.Display.RenderingHud += IfEnabled<RenderingHudEventArgs>(OnRenderingHud);
@@ -156,6 +157,17 @@ namespace TileLocked
     private void OnRenderedWorld(object? sender, RenderedWorldEventArgs e)
     {
       tileOverlayRenderer.OnRenderedWorld(e, inputManager.LastHoveredTile);
+    }
+
+    private void OnWarped(object? sender, WarpedEventArgs e)
+    {
+      if (!e.IsLocalPlayer) return;
+
+      if (PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH))
+      {
+        tileManager.UpdateReachableTiles(e.NewLocation);
+        tileManager.ClearStaleCachedTiles();
+      }
     }
 
     private void OnModMessageReceived(object? sender, ModMessageReceivedEventArgs e)

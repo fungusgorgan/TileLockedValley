@@ -93,6 +93,18 @@ namespace TileLocked
           return;
         }
       }
+      
+      // If player encounters a tile that is now reachable but was not when the map was loaded (Beach Bridge Unlock, for example)
+      if (
+        PerSaveConfig.GetBool(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH) &&
+        IsPlayerFacingAnUncachedReachableTile(out Vector2 tile)
+        )
+      {
+          tileManager.ExpandReachableTiles(
+              Game1.currentLocation,
+              tile
+          );
+      }
 
       // If locked tile is more than 1 away from previous tile, assume this was a warp
       if (IsPlayerBoxInLockedTile(playerBox)
@@ -192,6 +204,43 @@ namespace TileLocked
           || !tileManager.IsTileUnlocked(Game1.player.currentLocation, topRight)
           || !tileManager.IsTileUnlocked(Game1.player.currentLocation, bottomLeft)
           || !tileManager.IsTileUnlocked(Game1.player.currentLocation, bottomRight);
+    }
+
+    private bool IsPlayerFacingAnUncachedReachableTile(out Vector2 tile)
+    {
+        tile = Vector2.Zero;
+
+        GameLocation location = Game1.currentLocation;
+
+        Vector2 facingTile = Game1.player.Tile;
+
+        switch (Game1.player.FacingDirection)
+        {
+            case Game1.up:
+                facingTile.Y -= 1;
+                break;
+
+            case Game1.right:
+                facingTile.X += 1;
+                break;
+
+            case Game1.down:
+                facingTile.Y += 1;
+                break;
+
+            case Game1.left:
+                facingTile.X -= 1;
+                break;
+        }
+
+        if (tileManager.ReachableTiles.Contains(facingTile))
+            return false;
+
+        if (tileManager.IsNeverWalkable(location, facingTile))
+            return false;
+
+        tile = facingTile;
+        return true;
     }
   }
 }
