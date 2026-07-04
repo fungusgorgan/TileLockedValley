@@ -21,6 +21,7 @@ namespace TileLocked
     private InputManager inputManager;
     private MultiplayerManager multiplayerManager;
     private TileOverlayRenderer tileOverlayRenderer;
+    private TileStyles tileStyles = null!;
     private TileInfoRenderer tileInfoRenderer;
     private UnveilingGlassTooltipRenderer unveilingGlassTooltipRenderer;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -31,14 +32,15 @@ namespace TileLocked
       rewardsManager = new(tileManager);
       config = helper.ReadConfig<ModConfig>();
 
-      configMenuRegistrar = new ConfigMenuRegistrar(helper, ModManifest, config);
       delegateRegistrar = new DelegateRegistrar(tileManager);
-      tileOverlayRenderer = new(config, tileManager);
+      tileStyles = new TileStyles(config);
+      tileOverlayRenderer = new(tileManager, tileStyles);
       inputManager = new(config, tileManager, tileOverlayRenderer);
       playerManager = new(tileManager);
       multiplayerManager = new(helper, ModManifest, tileManager);
       tileInfoRenderer = new(config, tileManager);
       unveilingGlassTooltipRenderer = new(tileManager);
+      configMenuRegistrar = new ConfigMenuRegistrar(helper, ModManifest, config, tileStyles);
 
       helper.Events.GameLoop.GameLaunched += OnGameLaunched;
       helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
