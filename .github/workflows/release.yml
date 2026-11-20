@@ -39,7 +39,7 @@ jobs:
           version: ${{ steps.zip.outputs.version }}
           display_name: Tile-Locked Valley
           changelog: ${{ github.event.release.body }}
-          archive_existing_version: 'true'
+          archive_existing_version: 'false'
           update_mod_version: 'true'
 
       - name: Upload to CurseForge
