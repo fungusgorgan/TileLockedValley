@@ -1,0 +1,64 @@
+# Uploads the zip attached to a published GitHub Release to Nexus Mods and CurseForge.
+# Create releases with: ./package.sh <version> --release
+name: Publish release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release zip
+        id: zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir dist
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.zip' --dir dist
+          count=$(find dist -name '*.zip' | wc -l)
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Expected exactly one .zip on release $TAG, found $count"
+            exit 1
+          fi
+          echo "path=$(find dist -name '*.zip')" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload to Nexus Mods
+        uses: Nexus-Mods/upload-action@98532f7670c27cbecc78fae03fa3e278147827e2 # v1.0.0-beta.11
+        with:
+          api_key: ${{ secrets.NEXUS_API_KEY }}
+          mod_id: ${{ vars.NEXUS_MOD_ID }}
+          file_id: ${{ vars.NEXUS_FILE_ID }}
+          filename: ${{ steps.zip.outputs.path }}
+          version: ${{ steps.zip.outputs.version }}
+          display_name: Tile-Locked Valley
+          changelog: ${{ github.event.release.body }}
+          archive_existing_version: 'true'
+          update_mod_version: 'true'
+
+      - name: Upload to CurseForge
+        env:
+          CF_TOKEN: ${{ secrets.CURSEFORGE_API_TOKEN }}
+          CF_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          CF_GAME_VERSION_ID: ${{ vars.CURSEFORGE_GAME_VERSION_ID }}
+          ZIP_PATH: ${{ steps.zip.outputs.path }}
+          VERSION: ${{ steps.zip.outputs.version }}
+          CHANGELOG: ${{ github.event.release.body }}
+        run: |
+          metadata=$(jq -n \
+            --arg changelog "$CHANGELOG" \
+            --arg name "Tile-Locked Valley $VERSION" \
+            --argjson gameVersion "$CF_GAME_VERSION_ID" \
+            '{changelog: $changelog, changelogType: "markdown", displayName: $name,
+              gameVersions: [$gameVersion], releaseType: "release"}')
+          curl --fail-with-body -sS \
+            -H "X-Api-Token: $CF_TOKEN" \
+            --form-string "metadata=$metadata" \
+            -F "file=@$ZIP_PATH" \
+            "https://stardewvalley.curseforge.com/api/projects/$CF_PROJECT_ID/upload-file"
