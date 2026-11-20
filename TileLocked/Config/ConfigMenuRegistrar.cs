@@ -1,4 +1,7 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using TileLocked.Rendering;
 
 namespace TileLocked.Config
 {
@@ -7,12 +10,18 @@ namespace TileLocked.Config
     private readonly IModHelper helper;
     private readonly IManifest modManifest;
     private ModConfig config;
+    private readonly TileStyles tileStyles;
 
-    public ConfigMenuRegistrar(IModHelper helper, IManifest modManifest, ModConfig config)
+    public ConfigMenuRegistrar(
+        IModHelper helper,
+        IManifest modManifest,
+        ModConfig config,
+        TileStyles tileStyles)
     {
-      this.helper = helper;
-      this.modManifest = modManifest;
-      this.config = config;
+        this.helper = helper;
+        this.modManifest = modManifest;
+        this.config = config;
+        this.tileStyles = tileStyles;
     }
 
     public void InitializeConfigMenu()
@@ -71,14 +80,34 @@ namespace TileLocked.Config
         name: () => "Locked tile overlay color",
         tooltip: () => "The color used to highlight locked tiles, in hexadecimal RGB format (e.g. FF0000 for red).",
         getValue: () => config.LockedTileOverlayColor,
-        setValue: value => config.LockedTileOverlayColor = value
+        setValue: value => {
+          config.LockedTileOverlayColor = value;
+          tileStyles.ApplyConfigColors();
+        },
+        fieldId: "locked_color"
       );
       configMenu.AddTextOption(
         mod: modManifest,
         name: () => "Unlocked tile overlay color",
         tooltip: () => "The color used to highlight unlocked tiles, in hexadecimal RGB format (e.g. 00FF00 for green).",
         getValue: () => config.UnlockedTileOverlayColor,
-        setValue: value => config.UnlockedTileOverlayColor = value
+        setValue: value => {
+          config.UnlockedTileOverlayColor = value;
+          tileStyles.ApplyConfigColors();
+          },
+        fieldId: "unlocked_color"
+      );
+      configMenu.OnFieldChanged(modManifest, OnConfigFieldChanged);
+      configMenu.AddComplexOption(
+        mod: modManifest,
+        name: () => "Preview",
+        draw: DrawOverlayPreview,
+        beforeMenuOpened: () =>
+        {
+            tileStyles.LockedTilePreview.CopyFrom(tileStyles.LockedTile);
+            tileStyles.UnlockedTilePreview.CopyFrom(tileStyles.UnlockedTile);
+        },
+        height: () => 80
       );
       configMenu.AddSectionTitle(modManifest, () => "Tile Info");
       configMenu.AddBoolOption(
@@ -165,5 +194,34 @@ namespace TileLocked.Config
         setValue: value => PerSaveConfig.Set(PerSaveConfig.Key.ONLY_LOCK_TILES_PLAYER_CAN_REACH, value.ToString(), helper)
       );
     }
+
+    private void DrawOverlayPreview(SpriteBatch spriteBatch, Vector2 position)
+    {
+        tileStyles.LockedTilePreview.Draw(
+            spriteBatch,
+            new Rectangle((int)position.X, (int)position.Y, 64, 64)
+        );
+
+        tileStyles.UnlockedTilePreview.Draw(
+            spriteBatch,
+            new Rectangle((int)position.X + 80, (int)position.Y, 64, 64)
+        );
+    }
+    private void OnConfigFieldChanged(string fieldId, object value)
+    {
+        switch (fieldId)
+        {
+            case "locked_color":
+                if (value is string locked && TileStyles.TryParseHexColor(locked, out var lcolor))
+                    tileStyles.LockedTilePreview.Fill.Color = lcolor;
+                break;
+
+            case "unlocked_color":
+                if (value is string unlocked && TileStyles.TryParseHexColor(unlocked, out var ucolor))
+                    tileStyles.UnlockedTilePreview.Border.Color = ucolor;
+                break;
+        }
+    }
+    
   }
 }

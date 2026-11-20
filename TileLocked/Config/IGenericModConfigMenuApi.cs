@@ -159,10 +159,17 @@ namespace TileLocked.Config
         /// <param name="height">The pixel height to allocate for the option in the form, or <c>null</c> for a standard input-sized option. This is called and cached each time the form is opened.</param>
         /// <param name="fieldId">The unique field ID for use with <see cref="OnFieldChanged"/>, or <c>null</c> to auto-generate a randomized ID.</param>
         /// <remarks>The custom logic represented by the callback parameters is responsible for managing its own state if needed. For example, you can store state in a static field or use closures to use a state variable.</remarks>
-        // void AddComplexOptionWithGamepadSupport(IManifest mod, Func<string> name, Action<SpriteBatch, Vector2> draw, Func<string>? tooltip = null,
-        //     Action? beforeMenuOpened = null, Action? beforeSave = null, Action? afterSave = null, Action? beforeReset = null, Action? afterReset = null, Action? beforeMenuClosed = null,
-        //     Func<IEnumerable<ClickableComponent>>? snapRegionsOverride = null, Func<bool>? snapRegionsNeedRefreshing = null, Func<bool?>? usingGamepadMovement = null,
-        //     Func<int>? height = null, string? fieldId = null);
+        void AddComplexOption(IManifest mod, Func<string> name,
+            Action<SpriteBatch, Vector2> draw,
+            Func<string>? tooltip = null,
+            Action? beforeMenuOpened = null,
+            Action? beforeSave = null,
+            Action? afterSave = null,
+            Action? beforeReset = null,
+            Action? afterReset = null,
+            Action? beforeMenuClosed = null,
+            Func<int>? height = null,
+            string? fieldId = null);
 
         /// <summary>Set whether the options registered after this point can only be edited from the title screen.</summary>
         /// <param name="mod">The mod's manifest.</param>
